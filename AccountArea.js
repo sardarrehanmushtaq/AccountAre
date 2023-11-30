@@ -1,15 +1,40 @@
-// src/AccountArea.js
-import React, { useState, useEffect } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jwt_decode from 'jwt-decode';
 
+// Define action types for the reducer
+const actionTypes = {
+  FETCH_PRODUCTS_SUCCESS: 'FETCH_PRODUCTS_SUCCESS',
+  FETCH_PRODUCTS_FAILURE: 'FETCH_PRODUCTS_FAILURE',
+  SET_USER: 'SET_USER',
+};
+
+// Reducer function to manage component state
+const reducer = (state, action) => {
+  switch (action.type) {
+    case actionTypes.FETCH_PRODUCTS_SUCCESS:
+      return { ...state, products: action.payload, loading: false, error: null };
+    case actionTypes.FETCH_PRODUCTS_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+    case actionTypes.SET_USER:
+      return { ...state, user: action.payload };
+    default:
+      return state;
+  }
+};
+
 const AccountArea = () => {
-  const [user, setUser] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Initialize state using useReducer
+  const [state, dispatch] = useReducer(reducer, {
+    user: null,
+    products: [],
+    loading: true,
+    error: null,
+  });
+
+  // Fetch products and update state accordingly
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -22,56 +47,54 @@ const AccountArea = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorMessage = await response.text();
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorMessage}`);
         }
 
         const data = await response.json();
-        setProducts(data.products);
+        dispatch({ type: actionTypes.FETCH_PRODUCTS_SUCCESS, payload: data.products });
       } catch (error) {
         console.error('Error fetching products:', error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
+        dispatch({ type: actionTypes.FETCH_PRODUCTS_FAILURE, payload: error.message });
       }
     };
 
     fetchProducts();
-
-    // Cleanup function to cancel the fetch when the component unmounts
-    return () => {
-      // Add any cleanup logic, such as aborting the fetch if necessary
-    };
   }, []);
 
+  // Check user token and navigate to login if not present
   useEffect(() => {
     const token = localStorage.getItem('productly');
     if (!token) {
       navigate('/login');
     } else {
-      const decodedUser = jwt_decode(token);
-      setUser(decodedUser);
+      dispatch({ type: actionTypes.SET_USER, payload: jwt_decode(token) });
     }
   }, [navigate]);
 
-  // Corrected implementation of progress bar width calculation
-  const progressBarWidth = () => {
-    const maxProducts = 50; // Hardcoded value
-    return (products.length / maxProducts) * 100;
+  const calculateProgressBarWidth = () => {
+    const maxProducts = Math.max(1, state.products.length);
+    return (state.products.length / maxProducts) * 100;
   };
 
   return (
     <div>
-      {error && <p>Error: {error}</p>}
-      {loading && <p>Loading...</p>}
+      {state.error && (
+        <div style={{ color: 'red', border: '1px solid red', padding: '8px', marginBottom: '10px' }}>
+          <strong>Error:</strong> {state.error}
+        </div>
+      )}
+      {state.loading && <p>Loading...</p>}
+
       <div>
-        {products.map((product) => (
+        {state.products.map((product) => (
           <div key={product.id}>
             <h3>{product.name}</h3>
             <p>{product.description}</p>
           </div>
         ))}
       </div>
-      <div style={{ width: `${progressBarWidth()}%` }}>Progress Bar</div>
+      <div style={{ width: `${calculateProgressBarWidth()}%` }}>Progress Bar</div>
     </div>
   );
 };
