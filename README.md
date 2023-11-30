@@ -1,70 +1,41 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Bugs Identified:
+**Incomplete Error Handling in useEffect:**
+The useEffect that fetches products lacks proper error handling, and it doesn't set the loading state. If an error occurs during the fetch, the loading state will remain true, giving the user no indication that an error has occurred.
+**Missing Product Descriptions:**
+The product descriptions are missing from the rendered components.
+**Hardcoded Maximum Products for Progress Bar:**
+The progress bar width calculation is based on a hardcoded maximum number of products (50). This value should be dynamic or passed as a prop to the component.
 
-## Available Scripts
+Changes Made:
+**Error Handling and Loading State:**
+Added proper error handling in the useEffect for fetching products.
+Set the loading state to false in the finally block to indicate that the fetch operation is complete.
 
-In the project directory, you can run:
+**Include Product Descriptions:**
+Added the missing product descriptions in the rendered components.
+**Dynamic Maximum Products for Progress Bar:**
+Dynamically calculate the maximum products for the progress bar based on the number of fetched products. This ensures that the progress bar is responsive to changes in the number of products.
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+REFACTORING OF CODE:
+Changes Made:
+Removed Unused State (user):
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Removed the user state since it wasn't being utilized.
+Improved Variable Naming:
 
-### `npm test`
+Renamed progressBarWidth to calculateProgressBarWidth for clarity.
+Simplified User Decoding:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Simplified the decoding of the user from the JWT token.
+Consolidated Loading and Error States:
 
-### `npm run build`
+Consolidated the loading and error states into a single useEffect for fetching products. This avoids duplication and ensures consistent state management.
+Improved Dynamic Maximum Products Calculation:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Simplified the calculation of the dynamic maximum products for the progress bar.
+Removed Redundant useState Initialization:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Removed redundant initialization of useState for user, products, loading, and error. The initial values are null, [], true, and null, respectively, which are already set during state declaration.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
